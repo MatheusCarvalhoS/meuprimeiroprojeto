@@ -5,13 +5,19 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import com.servico.rest.api.enums.PerfilEnum;
@@ -31,18 +37,37 @@ public class Funcionario implements Serializable {
 
 	@Column(name = "email", nullable = false)
 	private String email;
+	
+	@Column(name = "senha", nullable = true)
 	private String senha;
+	
+	@Column(name = "cpf", nullable = false)
 	private String cpf;
+	
+	@Column(name = "valor_hora", nullable = true)
 	private BigDecimal valorHora;
+	
+	@Column(name = "qtd_horas_trabalho_dia", nullable = true)
 	private Float qtdHorasTrabalhoDia;
+	
+	@Column(name = "qtd_horas_almoco", nullable = true)
 	private Float qtdHorasAlmoco;
+	
+	@Enumerated(EnumType.STRING) // Diz ao JOP para salvar a referência textual e não o inteiro
+	@Column(name = "perfil", nullable = true)
 	private PerfilEnum perfil;
+	
+	@Column(name = "data_criacao", nullable = true)
 	private Date dataCriacao;
+	
+	@Column(name = "data_atualizacao", nullable = true)
 	private Date dataAtualizacao;
 
-	@OneToMany(fetch = FetchType.EAGER) //////////////////////////////////////////////////////////
+	@ManyToOne(fetch = FetchType.EAGER) //////////////////////////////////////////////////////////
 	private Empresa empresa;
-	private List<Lancamento> listLancamentos;
+	
+	@OneToMany(mappedBy = "lancamento", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<Lancamento> lancamentos;
 
 	Funcionario() {
 	}
@@ -144,10 +169,21 @@ public class Funcionario implements Serializable {
 	}
 
 	public List<Lancamento> getListLancamentos() {
-		return listLancamentos;
+		return lancamentos;
 	}
 
 	public void setListLancamentos(List<Lancamento> listLancamentos) {
-		this.listLancamentos = listLancamentos;
+		this.lancamentos = listLancamentos;
 	}
+	
+	@PreUpdate
+	public void preUpdate() {
+		this.dataAtualizacao = new Date();
+	}
+
+	@PrePersist
+	public void prePersist() {
+		this.dataCriacao = this.dataAtualizacao = new Date();
+	}
+	
 }

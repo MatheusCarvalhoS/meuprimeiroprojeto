@@ -46,7 +46,7 @@ public class Empresa implements Serializable {
 	 * 		LAZY  -> Não quer a lista de funcionários quando trazer uma empresa - Chamada preguiçosa mais utilizada
 	 */ 
 	@OneToMany(mappedBy = "empresa", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Funcionario> listFuncionarios;
+	private List<Funcionario> funcionarios;
 
 	public Empresa() {
 	}
@@ -92,11 +92,11 @@ public class Empresa implements Serializable {
 	}
 
 	public List<Funcionario> getListFuncionarios() {
-		return listFuncionarios;
+		return funcionarios;
 	}
 
 	public void setListFuncionarios(List<Funcionario> listFuncionarios) {
-		this.listFuncionarios = listFuncionarios;
+		this.funcionarios = listFuncionarios;
 	}
 
 	@PreUpdate
@@ -106,9 +106,7 @@ public class Empresa implements Serializable {
 
 	@PrePersist
 	public void prePersist() {
-		final Date atual = new Date();
-		this.dataCriacao = atual;
-		this.dataAtualizacao = atual;
+		this.dataCriacao = this.dataAtualizacao = new Date();
 	}
 
 }
